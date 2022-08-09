@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheWelcome from "@/components/TheWelcome.vue";
+import ImageUploader from '../components/ImageUploader.vue'
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <ImageUploader />
   </main>
 </template>
