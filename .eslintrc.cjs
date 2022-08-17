@@ -23,5 +23,6 @@ module.exports = {
   },
   rules: {
     'import/no-extraneous-dependencies': 'off',
+    'promise/prefer-await-to-then': 'off',
   },
 }
