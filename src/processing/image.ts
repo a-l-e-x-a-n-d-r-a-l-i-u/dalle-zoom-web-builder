@@ -6,6 +6,7 @@ import { PaintMethod } from '@imagemagick/magick-wasm/paint-method'
 import { MagickFormat } from '@imagemagick/magick-wasm/magick-format'
 import { AlphaOption } from '@imagemagick/magick-wasm/alpha-option'
 import { CompositeOperator } from '@imagemagick/magick-wasm/composite-operator'
+import { Gravity } from '@imagemagick/magick-wasm/gravity'
 
 const DALLE_IMAGE_SIZE = 1024
 const FEATHER_EDGE_SIZE = 40
@@ -27,7 +28,7 @@ async function getFeatherMask(): Promise<Uint8Array> {
         image.borderColor = new MagickColor('black')
         image.border(FEATHER_EDGE_SIZE)
         image.blur(FEATHER_EDGE_SIZE, FEATHER_SIGMA_VALUE)
-        image.write((output) => resolve(new Uint8Array(output)), MagickFormat.Miff)
+        image.write((output) => resolve(new Uint8Array(output)), MagickFormat.Png)
       },
     )
   })
@@ -63,7 +64,7 @@ export async function cropDalleSignature(input: Uint8Array): Promise<Uint8Array>
         }
       }
       image.draw(new DrawableFillColor(new MagickColor(0, 0, 0, 0)), ...signaturePixels)
-      image.write((output) => resolve(new Uint8Array(output)), MagickFormat.Miff)
+      image.write((output) => resolve(new Uint8Array(output)), MagickFormat.Png)
     })
   })
 }
@@ -81,17 +82,38 @@ export async function addBorder(input: Uint8Array, percentOfOriginal: number): P
   })
 }
 
-export async function buildFeatheredEdgeForCombining(input: Uint8Array): Promise<Uint8Array> {
+async function maskOutEdges(
+  imageInput: Uint8Array,
+  backgroundInput?: { image: Uint8Array; percent: number },
+): Promise<Uint8Array> {
   await initializeImageMagick()
-  const mask = await getFeatherMask()
+  const maskData = await getFeatherMask()
   return new Promise((resolve) => {
-    ImageMagick.read(input, (image) => {
-      ImageMagick.read(mask, (maskImage) => {
-        maskImage.alpha(AlphaOption.Copy)
-        image.composite(maskImage, CompositeOperator.DstIn)
+    ImageMagick.read(maskData, (mask) => {
+      ImageMagick.read(imageInput, (image) => {
+        mask.alpha(AlphaOption.Copy)
+        image.composite(mask, CompositeOperator.DstIn)
         image.alpha(AlphaOption.Set)
+        if (backgroundInput) {
+          ImageMagick.read(backgroundInput.image, (background) => {
+            const overlapZone = DALLE_IMAGE_SIZE * backgroundInput.percent
+            background.crop(overlapZone, overlapZone, Gravity.Center)
+            background.resize(DALLE_IMAGE_SIZE, DALLE_IMAGE_SIZE)
+            image.composite(background, CompositeOperator.DstOver)
+          })
+        }
         image.write((output) => resolve(new Uint8Array(output)), MagickFormat.Png)
       })
     })
   })
+}
+
+export async function buildInnerTransitionFrame(image: Uint8Array): Promise<Uint8Array> {
+  return maskOutEdges(image)
+}
+export async function buildOuterTransitionFrame(
+  image: Uint8Array,
+  background: { image: Uint8Array; percent: number },
+): Promise<Uint8Array> {
+  return maskOutEdges(image, background)
 }

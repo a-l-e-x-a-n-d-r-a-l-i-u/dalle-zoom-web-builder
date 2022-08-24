@@ -4,8 +4,9 @@ import type { Table } from 'dexie'
 export interface Frame {
   id?: number
   rawUpload: Blob
-  featheredFrame?: Blob
-  nextFrameFeed?: Blob
+  noSignature: Blob
+  nextFrameFeed: Blob
+  transitionVideo?: Blob
 }
 export interface KeyValue<T> {
   key: string
@@ -35,6 +36,18 @@ export class DalleZoomDexie extends Dexie {
 
   async getInfillPercent(): Promise<number> {
     return this.getSettingValue('infillPercent', 0.333333)
+  }
+
+  async getSecondsPerTransition(): Promise<number> {
+    return this.getSettingValue('secondsPerTransition', 5)
+  }
+
+  async getFps(): Promise<number> {
+    return this.getSettingValue('fps', 24)
+  }
+
+  async getSuperSampleFactor(): Promise<number> {
+    return this.getSettingValue('superSampleFactor', 6)
   }
 }
 

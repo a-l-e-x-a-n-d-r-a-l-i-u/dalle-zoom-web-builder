@@ -4,6 +4,7 @@
       <n-text style="font-size: 16px"> Click or drag a next image to this area </n-text>
     </n-upload-dragger>
   </n-upload>
+  <button @click="render">Render</button>
 </template>
 
 <script lang="ts">
@@ -11,6 +12,7 @@ import { defineComponent } from 'vue'
 import { NUpload, NUploadDragger, NText, type UploadCustomRequestOptions } from 'naive-ui'
 import sleep from 'sleep-promise'
 import { processFrame } from '../workflow/frame'
+import { renderAll } from '../workflow/render'
 
 export default defineComponent({
   components: {
@@ -33,6 +35,9 @@ export default defineComponent({
       await sleep(1000)
       const uploader = this.$refs.uploader as InstanceType<typeof NUpload>
       uploader.clear()
+    },
+    async render(): Promise<void> {
+      await renderAll()
     },
   },
 })
