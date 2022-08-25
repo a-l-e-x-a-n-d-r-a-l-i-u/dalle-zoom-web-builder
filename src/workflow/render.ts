@@ -3,7 +3,7 @@ import { blobToUint8, Uint8ToBlob, buildInnerTransitionFrame, buildOuterTransiti
 import { buildFrameTransition, mergeVideos } from '../processing/video'
 import { db } from '../stores/db'
 
-export async function renderForFrame(startFrameId: number): Promise<Uint8Array> {
+async function renderForFrame(startFrameId: number): Promise<Uint8Array> {
   const startFrameData = await db.frames.get(startFrameId)
   const endFrameData = await db.frames.get(startFrameId + 1)
   const afterEndFrameData = await db.frames.get(startFrameId + 2)
@@ -21,15 +21,19 @@ export async function renderForFrame(startFrameId: number): Promise<Uint8Array> 
         percent,
       })
     : await blobToUint8(endFrameData.rawUpload)
-  const transitionVideoData = await buildFrameTransition(innerTransitionFrameImage, outerTransitionFrameImage, {
+  return buildFrameTransition(innerTransitionFrameImage, outerTransitionFrameImage, {
     percent,
     seconds,
     fps,
     superSampleFactor,
+    skipLastFrame: afterEndFrameData != null,
   })
+}
+
+export async function renderForFrameAndSave(startFrameId: number): Promise<void> {
+  const transitionVideoData = await renderForFrame(startFrameId)
   const transitionVideo = Uint8ToBlob(transitionVideoData)
   await db.frames.update(startFrameId, { transitionVideo })
-  return transitionVideoData
 }
 
 export async function renderAll(): Promise<void> {

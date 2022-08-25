@@ -1,6 +1,7 @@
 import { saveAs } from 'file-saver'
 import { db } from '../stores/db'
 import { addBorder, cropDalleSignature, blobToUint8, Uint8ToBlob, ensureImageRightSize } from '../processing/image'
+import { renderForFrameAndSave } from './render'
 
 export async function processFrame(rawUpload: File): Promise<void> {
   try {
@@ -13,6 +14,9 @@ export async function processFrame(rawUpload: File): Promise<void> {
     const key = await db.frames.add({ rawUpload, noSignature: noSignatureAsBlob, nextFrameFeed })
     console.log('new file added to db', key)
     saveAs(nextFrameFeed, `frame_${key}_infill.png`)
+    if (key >= 3) {
+      await renderForFrameAndSave(key - 2)
+    }
   } catch (error) {
     console.error('failed to process frame', error)
     throw error

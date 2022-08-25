@@ -35,7 +35,7 @@ export class DalleZoomDexie extends Dexie {
   }
 
   async getInfillPercent(): Promise<number> {
-    return this.getSettingValue('infillPercent', 0.333333)
+    return this.getSettingValue('infillPercent', 0.5)
   }
 
   async getSecondsPerTransition(): Promise<number> {
@@ -47,7 +47,7 @@ export class DalleZoomDexie extends Dexie {
   }
 
   async getSuperSampleFactor(): Promise<number> {
-    return this.getSettingValue('superSampleFactor', 6)
+    return this.getSettingValue('superSampleFactor', 5)
   }
 }
 

@@ -28,43 +28,52 @@ export async function buildFrameTransition(
     seconds: number
     fps: number
     superSampleFactor: number
+    skipLastFrame: boolean
   },
 ): Promise<Uint8Array> {
   const innerOversizeFactor = options.superSampleFactor * options.percent
-  const scaleFactor = Math.min(1 / options.percent, 10)
-  const scaleReductionFactor = scaleFactor - 1
+  const zoomFactor = Math.min(1 / options.percent, 10)
+  const zoomReductionFactor = zoomFactor - 1
   const framesToRender = Math.ceil(options.fps * options.seconds)
   const ffmpeg = await getLoadedFFmpeg()
   ffmpeg.FS('writeFile', 'innerFrame.png', innerFrame)
   ffmpeg.FS('writeFile', 'outerFrame.png', outerFrame)
-  await ffmpeg.run(
-    '-loop',
-    '1',
-    '-i',
-    'innerFrame.png',
-    '-loop',
-    '1',
-    '-i',
-    'outerFrame.png',
-    '-filter_complex',
-    [
-      `[1:v]scale=-2:${options.superSampleFactor}*ih[outer]`,
-      `[0:v]scale=-2:${innerOversizeFactor}*ih[inner]`,
-      `[outer][inner]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2[combo]`,
-      `[combo]zoompan=z='${scaleFactor}-on/duration*${scaleReductionFactor}':d=${framesToRender}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1024x1024:fps=${options.fps}`,
-    ].join(','),
-    '-c:v',
-    'libx264',
-    '-crf',
-    '18',
-    '-t',
-    `${options.seconds}`,
-    '-s',
-    '1024x1024',
-    '-pxl_fmt',
-    'yuv444p',
-    OUTPUT_FILE_NAME,
-  )
+  try {
+    await ffmpeg.run(
+      '-loop',
+      '1',
+      '-i',
+      'innerFrame.png',
+      '-loop',
+      '1',
+      '-i',
+      'outerFrame.png',
+      '-filter_complex',
+      [
+        `[1:v]scale=-2:${options.superSampleFactor}*ih[outer]`,
+        `[0:v]scale=-2:${innerOversizeFactor}*ih[inner]`,
+        `[outer][inner]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2`,
+        `zoompan=z='${zoomFactor}-on/duration*${zoomReductionFactor}':d=${framesToRender}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1024x1024:fps=${options.fps}`,
+        options.skipLastFrame ? `select=not(eq(n-1\\,${framesToRender}))` : null,
+      ]
+        .filter((x) => !!x)
+        .join(','),
+      '-c:v',
+      'libx264',
+      '-crf',
+      '18',
+      '-t',
+      `${options.seconds}`,
+      '-s',
+      '1024x1024',
+      '-pix_fmt',
+      'yuv422p',
+      OUTPUT_FILE_NAME,
+    )
+  } catch (error) {
+    ffmpeg.exit()
+    throw error
+  }
   const result = ffmpeg.FS('readFile', OUTPUT_FILE_NAME)
   ffmpeg.FS('unlink', OUTPUT_FILE_NAME)
   return result
