@@ -16,6 +16,7 @@
     "@imagemagick/magick-wasm": "^0.0.14",
     "@vueuse/rxjs": "^9.1.0",
     "dexie": "^3.2.2",
+    "dexie-export-import": "^1.0.3",
     "file-saver": "^2.0.5",
     "pinia": "^2.0.16",
     "rxjs": "^7.5.6",

@@ -49,6 +49,14 @@ export class DalleZoomDexie extends Dexie {
   async getSuperSampleFactor(): Promise<number> {
     return this.getSettingValue('superSampleFactor', 5)
   }
+
+  async getProjectName(): Promise<string> {
+    return this.getSettingValue('projectName', 'default')
+  }
+
+  async setProjectName(name: string): Promise<void> {
+    await this.settings.add({ key: 'projectName', value: name })
+  }
 }
 
 export const db = new DalleZoomDexie()
