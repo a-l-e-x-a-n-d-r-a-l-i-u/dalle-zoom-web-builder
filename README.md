@@ -7,6 +7,8 @@ It will take your image and crop and resize it for appropriate upload back to da
 
 - The video looks terrible. The speed is inconsistent. And composite is unaligned. FFMPEG filters are an art, apparently.
 - The website UI is terrible. It is all boilerplate now, but the plan is to put some retro looking UI in like https://github.com/botoxparty/XP.css or https://github.com/sakofchit/system.css
+- Need a visual of each frame that has been uploaded, on a timeline looking thing.
+- Need to be able to change the settings
 
 ## Project Setup
 
