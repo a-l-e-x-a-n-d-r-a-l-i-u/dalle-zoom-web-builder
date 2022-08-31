@@ -1,25 +1,12 @@
 # dalle-zoom-web-builder
 
-This template should help get you started developing with Vue 3 in Vite.
+This project is an attempt to make automatic tooling to help make dalle zoom videos using the dalle infill feature over and over with the same image set.
+It will take your image and crop and resize it for appropriate upload back to dalle, and it will (hopefully) merge those images together into one continuous video.
 
-## Recommended IDE Setup
+## TODO
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+- The video looks terrible. The speed is inconsistent. And composite is unaligned. FFMPEG filters are an art, apparently.
+- The website UI is terrible. It is all boilerplate now, but the plan is to put some retro looking UI in like https://github.com/botoxparty/XP.css or https://github.com/sakofchit/system.css
 
 ## Project Setup
 
