@@ -29,22 +29,43 @@ export default defineComponent({
   },
   methods: {
     async handleUpload(options: UploadCustomRequestOptions): Promise<void> {
+      if (!this.verifyFile(options)) return
+      await this.processFile(options)
+    },
+
+    verifyFile(options: UploadCustomRequestOptions): boolean {
       if (!options.file.file) {
         options.onError()
-        return
+        return false
       }
-      try {
-        await processFrame(options.file.file)
-        options.onFinish()
-      } catch {
-        options.onError()
+      return true
+    },
+
+    async processFile(options: UploadCustomRequestOptions): Promise<void> {
+      const file = options.file.file
+      if (file) {
+        try {
+          await processFrame(file)
+          options.onFinish()
+        } catch {
+          options.onError()
+        }
       }
-      await sleep(1000)
+      await this.clearUploader(9000) // Customisable wait duration (currently set to 9sec for testing)
+    },
+
+    async clearUploader(timeout: number): Promise<void> {
+      await sleep(timeout)
       const uploader = this.$refs.uploader as InstanceType<typeof NUpload>
       uploader.clear()
     },
+
     async render(): Promise<void> {
-      await renderAll()
+      try {
+        await renderAll()
+      } catch (error) {
+        console.error('Render failed', error)
+      }
     },
   },
 })
