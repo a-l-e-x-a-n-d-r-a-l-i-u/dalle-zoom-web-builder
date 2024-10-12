@@ -30,6 +30,7 @@ async function cleanUpFiles(ffmpeg: FFmpeg, fileNames: string[]): Promise<void> 
   fileNames.forEach((fileName) => ffmpeg.FS('unlink', fileName))
 }
 
+// Build frame transition with zoompan effect
 export async function buildFrameTransition(
   innerFrame: Uint8Array,
   outerFrame: Uint8Array,
@@ -45,8 +46,12 @@ export async function buildFrameTransition(
   const zoomFactor = Math.min(1 / options.percent, 10)
   const framesToRender = Math.ceil(options.fps * options.seconds)
   const ffmpeg = await getLoadedFFmpeg()
+
+  // Write frames to FFmpeg virtual filesystem
   ffmpeg.FS('writeFile', 'innerFrame.png', innerFrame)
   ffmpeg.FS('writeFile', 'outerFrame.png', outerFrame)
+
+  // FFmpeg command to render the zoompan transition
   try {
     await ffmpeg.run(
       '-loop',
@@ -65,7 +70,7 @@ export async function buildFrameTransition(
         `zoompan=z='exp(log(${zoomFactor})*(1-on/duration))':d=${framesToRender}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1024x1024:fps=${options.fps}`,
         options.skipLastFrame ? `select=not(eq(n-1\\,${framesToRender}))` : null,
       ]
-        .filter((x) => !!x)
+        .filter(Boolean)
         .join(','),
       '-c:v',
       'libx264',
@@ -83,29 +88,32 @@ export async function buildFrameTransition(
     ffmpeg.exit()
     throw error
   }
+
+  // Finalise the result
   const result = ffmpeg.FS('readFile', OUTPUT_FILE_NAME)
   await cleanUpFiles(ffmpeg, ['innerFrame.png', 'outerFrame.png', OUTPUT_FILE_NAME])
   return result
 }
 
+// Merge multiple videos into one
 export async function mergeVideos(videos: Uint8Array[]): Promise<Uint8Array> {
   const ffmpeg = await getLoadedFFmpeg()
   const files: string[] = []
 
-  for (const [index, video] of videos.entries()) {
+  videos.forEach((video, index) => {
     const fileName = `${index}.mp4`
     files.push(fileName)
     ffmpeg.FS('writeFile', fileName, video)
-  }
+  })
 
+  // Concat FFmpegs
   const concatFileContents = files.map((fileName) => `file '${fileName}'`).join('\n')
   ffmpeg.FS('writeFile', CONCAT_FILE_NAME, concatFileContents)
-
   await ffmpeg.run('-f', 'concat', '-i', CONCAT_FILE_NAME, '-c', 'copy', OUTPUT_FILE_NAME)
   console.log('Running FFmpeg to generate output.mp4', CONCAT_FILE_NAME)
+
+  // Finalise the result
   const result = ffmpeg.FS('readFile', OUTPUT_FILE_NAME)
-
   await cleanUpFiles(ffmpeg, [...files, CONCAT_FILE_NAME, OUTPUT_FILE_NAME])
-
   return result
 }
