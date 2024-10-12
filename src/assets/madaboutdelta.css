@@ -26,13 +26,6 @@
 
 /* Grid
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-html {
-  background-color: #e3d7ff;
-}
-
-body {
-  margin: 0px 60px;
-}
 
 .container {
   display: flex;
@@ -197,12 +190,20 @@ are based on 10px sizing. So basically 1.5rem = 15px :) */
 html {
   font-size: 62.5%;
 }
+
 body {
   font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
   line-height: 1.6;
   font-weight: 400;
   font-family: 'Comic Sans MS', 'Raleway', Helvetica, Arial, sans-serif;
   color: #3a477e;
+  background-color: #e3d7ff;
+}
+
+header {
+  color: #75dddd;
+  background-color: #3a477e;
+  padding: 20px 60px;
 }
 
 /* Typography
@@ -289,7 +290,8 @@ a:hover {
 button,
 input[type='submit'],
 input[type='reset'],
-input[type='button'] {
+input[type='button'],
+input::file-selector-button {
   display: inline-block;
   height: 38px;
   padding: 0 30px;
@@ -343,9 +345,14 @@ input[type='button'].button-primary {
   background-color: #09bc8a;
 }
 
+input::file-selector-button {
+  color: white;
+  background-color: #09bc8a;
+  font-family: 'Comic Sans MS', 'Raleway', Helvetica, Arial, sans-serif;
+}
+
 /* Forms
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-input[type='file'],
 input[type='email'],
 input[type='number'],
 input[type='search'],
@@ -359,6 +366,7 @@ select {
   padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
   background-color: #fff;
   border: 1px solid #e3d7ff;
+  color: #3a477e;
   border-radius: 4px;
   box-shadow: none;
   box-sizing: border-box;

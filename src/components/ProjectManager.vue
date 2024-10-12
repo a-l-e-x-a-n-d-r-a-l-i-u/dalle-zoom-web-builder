@@ -1,6 +1,6 @@
 <template>
   <h1>Project Controls</h1>
-  <div class="container space-around">
+  <div class="container space-between">
     <button @click="newProjectClick()">New</button>
     <input type="file" accept=".dalle" @change="importProjectChange($event)" />
     <button @click="exportProjectClick">Export</button>

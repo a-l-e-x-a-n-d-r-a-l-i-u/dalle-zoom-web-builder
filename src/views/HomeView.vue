@@ -12,12 +12,8 @@ import ProjectManager from '../components/ProjectManager.vue'
   </main>
 </template>
 <style scoped>
-header {
-  margin-top: 50px;
-}
 main {
   width: 400px;
-
   margin: auto;
   margin-top: 300px;
 }
