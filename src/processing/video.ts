@@ -5,21 +5,31 @@ import wasmPath from '@ffmpeg/core/dist/ffmpeg-core.wasm?url'
 // eslint-disable-next-line import/extensions
 import workerPath from '@ffmpeg/core/dist/ffmpeg-core.worker.js?url'
 
+// Constants
 const CONCAT_FILE_NAME = 'concat.txt'
 const OUTPUT_FILE_NAME = 'output.mp4'
 
+// FFmpeg instance setup
 const ffmpegInstance = createFFmpeg({
   log: true,
   corePath,
   wasmPath,
   workerPath,
 })
+
+// Ensure FFmpeg is loaded
 async function getLoadedFFmpeg(): Promise<FFmpeg> {
   if (!ffmpegInstance.isLoaded()) {
     await ffmpegInstance.load()
   }
   return ffmpegInstance
 }
+
+// Helper function to remove files from FFmpeg virtual filesystem
+async function cleanUpFiles(ffmpeg: FFmpeg, fileNames: string[]): Promise<void> {
+  fileNames.forEach((fileName) => ffmpeg.FS('unlink', fileName))
+}
+
 export async function buildFrameTransition(
   innerFrame: Uint8Array,
   outerFrame: Uint8Array,
@@ -94,10 +104,12 @@ export async function mergeVideos(videos: Uint8Array[]): Promise<Uint8Array> {
   await ffmpeg.run('-f', 'concat', '-i', CONCAT_FILE_NAME, '-c', 'copy', OUTPUT_FILE_NAME)
   console.log('Running FFmpeg to generate output.mp4', CONCAT_FILE_NAME)
   const result = ffmpeg.FS('readFile', OUTPUT_FILE_NAME)
+
   for (const fileName of files) {
     ffmpeg.FS('unlink', fileName) // these might pointlessly fill the memory
   }
   ffmpeg.FS('unlink', CONCAT_FILE_NAME)
   ffmpeg.FS('unlink', OUTPUT_FILE_NAME)
+
   return result
 }
