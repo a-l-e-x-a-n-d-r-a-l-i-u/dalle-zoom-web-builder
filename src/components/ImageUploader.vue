@@ -1,8 +1,14 @@
 <template>
   <h1>Next frame goes here</h1>
-  <n-upload list-type="image" accept="image/*" :show-remove-button="false" :custom-request="upload" ref="uploader">
+  <n-upload
+    list-type="image"
+    accept="image/*"
+    :show-remove-button="false"
+    :custom-request="handleUpload"
+    ref="uploader"
+  >
     <n-upload-dragger>
-      <n-text style="font-size: 16px"> Click or drag next image to this area </n-text>
+      <n-text>Click or drag the next image to this area</n-text>
     </n-upload-dragger>
   </n-upload>
   <button @click="render">Render</button>
@@ -22,7 +28,7 @@ export default defineComponent({
     NText,
   },
   methods: {
-    async upload(options: UploadCustomRequestOptions): Promise<void> {
+    async handleUpload(options: UploadCustomRequestOptions): Promise<void> {
       if (!options.file.file) {
         options.onError()
         return
