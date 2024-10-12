@@ -25,7 +25,7 @@ async function getLoadedFFmpeg(): Promise<FFmpeg> {
   return ffmpegInstance
 }
 
-// Helper function to remove files from FFmpeg virtual filesystem
+// Helper function to delete files from FFmpeg virtual filesystem
 async function cleanUpFiles(ffmpeg: FFmpeg, fileNames: string[]): Promise<void> {
   fileNames.forEach((fileName) => ffmpeg.FS('unlink', fileName))
 }
@@ -84,7 +84,7 @@ export async function buildFrameTransition(
     throw error
   }
   const result = ffmpeg.FS('readFile', OUTPUT_FILE_NAME)
-  ffmpeg.FS('unlink', OUTPUT_FILE_NAME)
+  await cleanUpFiles(ffmpeg, ['innerFrame.png', 'outerFrame.png', OUTPUT_FILE_NAME])
   return result
 }
 
@@ -105,11 +105,7 @@ export async function mergeVideos(videos: Uint8Array[]): Promise<Uint8Array> {
   console.log('Running FFmpeg to generate output.mp4', CONCAT_FILE_NAME)
   const result = ffmpeg.FS('readFile', OUTPUT_FILE_NAME)
 
-  for (const fileName of files) {
-    ffmpeg.FS('unlink', fileName) // these might pointlessly fill the memory
-  }
-  ffmpeg.FS('unlink', CONCAT_FILE_NAME)
-  ffmpeg.FS('unlink', OUTPUT_FILE_NAME)
+  await cleanUpFiles(ffmpeg, [...files, CONCAT_FILE_NAME, OUTPUT_FILE_NAME])
 
   return result
 }
