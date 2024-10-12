@@ -1,8 +1,10 @@
 <template>
-  <h1>project controls</h1>
-  <button @click="newProjectClick()">New</button>
-  <input type="file" accept=".dalle" @change="importProjectChange($event)" />
-  <button @click="exportProjectClick">Export</button>
+  <h1>Project Controls</h1>
+  <div class="container space-around">
+    <button @click="newProjectClick()">New</button>
+    <input type="file" accept=".dalle" @change="importProjectChange($event)" />
+    <button @click="exportProjectClick">Export</button>
+  </div>
   <n-modal
     v-model:show="showModal"
     preset="dialog"

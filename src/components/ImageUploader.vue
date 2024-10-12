@@ -1,5 +1,5 @@
 <template>
-  <h1>Next frame goes here</h1>
+  <h2>Next frame goes here</h2>
   <n-upload list-type="image" accept="image/*" :show-remove-button="false" :custom-request="upload" ref="uploader">
     <n-upload-dragger>
       <n-text style="font-size: 16px"> Click or drag next image to this area </n-text>
