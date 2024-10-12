@@ -24,21 +24,22 @@ export default defineComponent({
   methods: {
     async upload(options: UploadCustomRequestOptions): Promise<void> {
       if (!options.file.file) {
+        // Verifies the file (options.file.file)
         options.onError()
         return
       }
       try {
-        await processFrame(options.file.file)
+        await processFrame(options.file.file) // Runs if file is verified. What does this processFrame() do?
         options.onFinish()
       } catch {
         options.onError()
       }
-      await sleep(1000)
+      await sleep(1000) // Waits 1sec then clears the file
       const uploader = this.$refs.uploader as InstanceType<typeof NUpload>
       uploader.clear()
     },
     async render(): Promise<void> {
-      await renderAll()
+      await renderAll() // What does renderAll() do? Image disappears after it times out but nothing happens when click Render button
     },
   },
 })
