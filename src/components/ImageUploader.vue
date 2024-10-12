@@ -34,7 +34,7 @@ export default defineComponent({
       } catch {
         options.onError()
       }
-      await sleep(1000) // Waits 1sec then clears the file
+      await sleep(9000) // Waits 1sec then clears the file. For testing I made it 9sec
       const uploader = this.$refs.uploader as InstanceType<typeof NUpload>
       uploader.clear()
     },

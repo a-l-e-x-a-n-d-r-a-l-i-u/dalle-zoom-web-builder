@@ -92,6 +92,7 @@ export async function mergeVideos(videos: Uint8Array[]): Promise<Uint8Array> {
   ffmpeg.FS('writeFile', CONCAT_FILE_NAME, concatFileContents)
 
   await ffmpeg.run('-f', 'concat', '-i', CONCAT_FILE_NAME, '-c', 'copy', OUTPUT_FILE_NAME)
+  console.log('Running FFmpeg to generate output.mp4', CONCAT_FILE_NAME)
   const result = ffmpeg.FS('readFile', OUTPUT_FILE_NAME)
   for (const fileName of files) {
     ffmpeg.FS('unlink', fileName) // these might pointlessly fill the memory
